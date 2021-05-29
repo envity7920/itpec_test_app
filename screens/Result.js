@@ -3,10 +3,10 @@ import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { colors } from '../utils/colors';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
-const Result = ({ route,  navigation }) => {
+const Result = ({ route, navigation }) => {
 
 
-    const { abbr, fullname } = route.params;
+    const { abbr, fullname, score , scoreText} = route.params;
 
     return (
         <View style={styles.container}>
@@ -25,14 +25,35 @@ const Result = ({ route,  navigation }) => {
                 </TouchableOpacity>
             </View>
 
+
+
+            <View style={[styles.startQuizBtn, {
+                width: '100%',
+                alignItems: 'center',
+                justifyContent: 'center',
+                paddingVertical: 5
+            }]}>
+                <Text style={styles.text}>{fullname} Exam{'\n'}Mock Test</Text>
+
+            </View>
+
+
+            <Text style={{
+                marginTop: 20,
+                fontFamily: 'Montserrat-ExtraBold',
+                 color: colors.secondary_dark_blue, 
+                 fontSize: 25}}>
+                Your result: 
+            </Text>
+
             <View style={{
                 width: '100%',
                 justifyContent: 'center',
                 flexDirection: 'row',
             }}>
                 <View style={styles.bigLabel}>
-                    <FontAwesome name='trophy' size={30} color='white' />
-                    {/* <Text style={styles.bigLabelText}></Text> */}
+                    <FontAwesome name='trophy' size={30} color={colors.secondary_dark_blue} />
+                    <Text style={styles.bigLabelText}>{score ? score : 0}/20</Text>
                 </View>
             </View>
 
@@ -42,10 +63,9 @@ const Result = ({ route,  navigation }) => {
                 alignItems: 'center',
                 justifyContent: 'center'
             }}>
-                <Text style={styles.text}>Exam{'\n'}Mock Test</Text>
+                <Text style={styles.text}>{scoreText}</Text>
 
-                <Text style={styles.text}>20 questions </Text>
-                <Text style={styles.text}>Time alloted: 25 mins</Text>
+                
             </View>
 
             <TouchableOpacity
@@ -57,11 +77,11 @@ const Result = ({ route,  navigation }) => {
 
             >
 
-                <Text style={styles.startQuiz}>REDO THE TEST</Text>
+                <Text style={[styles.startQuiz, { textAlign: 'center' }]}>REDO THE TEST</Text>
             </TouchableOpacity>
 
 
-        </View>
+        </View >
     )
 }
 
@@ -90,8 +110,8 @@ const styles = StyleSheet.create({
     },
     bigLabel: {
         marginVertical: 20,
-        width: 100,
-        height: 100,
+        width: 200,
+        height: 200,
         backgroundColor: 'white',
         justifyContent: 'center',
         alignItems: 'center',
@@ -114,7 +134,8 @@ const styles = StyleSheet.create({
         backgroundColor: 'white',
         justifyContent: 'center',
         alignItems: 'center',
-        borderRadius: 20
+        borderRadius: 20,
+
 
 
     },

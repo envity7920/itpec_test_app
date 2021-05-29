@@ -166,9 +166,9 @@ const styles = StyleSheet.create({
 
   logo: {
     marginTop: 0,
-    height: 120,
-    width: 150,
-    resizeMode: 'cover'
+    height: 150,
+    width: 120,
+    resizeMode: 'contain'
 
   }
 });

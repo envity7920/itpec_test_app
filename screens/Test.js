@@ -2,6 +2,7 @@ import React, { useEffect, useReducer, useState } from 'react';
 import { Alert, BackHandler, FlatList, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import CountDown from 'react-native-countdown-component';
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
+import AnswerItem from '../components/AnswerItem';
 
 import QuestionText from '../components/QuestionText';
 import { colors } from '../utils/colors';
@@ -11,83 +12,36 @@ const Test = ({ route, navigation }) => {
   // Get question list from exam name
   const { abbr, fullname } = route.params;
   const questionList = questions[abbr];
-  const letter = ['A', 'B', 'C', 'D'];
-  // let userAnswers = {};
-  // try {
-  //   questionList.forEach(element => {
-  //     userAnswers[element._id] = '';
-  //   });
-  //   console.log(userAnswers);
-  // } catch (error) {
-  //   console.log(error)
-  // }
 
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [currentID, setCurrentID] = useState(questionList[0]['_id']);
-  const [answerChecked, setAnswerChecked] = useState(null);
-  const [userAnswerList, setUserAnswerList] = useState({});
-
-  const initialTestState = {
-    currentIndex: 0,
-    answerChecked: null,
-    userAnswerList: {}
-  }
-
-  const testReducer = (prevState, action) => {
-    switch (action.type) {
-      case 'PREV':
-        return {
-          ...prevState,
-          currentIndex: currentIndex > 0 ? currentIndex - 1 : currentIndex
-        }
-
-      case 'NEXT':
-        return {
-          ...prevState,
-          currentIndex: currentIndex < questionList.length - 1 ? currentIndex + 1 : currentIndex
-        }
-
-
-      case 'CHECK_ANSWER':
-        return {
-
-          ...prevState,
-          answerChecked: action.key
-        }
-
-        break;
-
-
-      default:
-        break;
-    }
-
-
-
-
-  }
-
-
+  const [userAnswerList, setUserAnswerList] = useState(new Map());
+  const [answerChecked, setAnswerChecked] = useState();
 
   const prev = () => {
     if (currentIndex > 0) {
       setCurrentIndex(currentIndex - 1);
-      setCurrentID(questionList[currentIndex-1]['_id']);
+      const prevID = questionList[currentIndex - 1]['_id'];
+      setCurrentID(prevID);
+
+      const prevCheck = userAnswerList.get(prevID);
+      setAnswerChecked(prevCheck ? prevCheck : null);
+
     }
   }
 
   const next = () => {
     if (currentIndex < questionList.length - 1) {
       setCurrentIndex(currentIndex + 1);
-      setCurrentID(questionList[currentIndex+1]['_id']);
+      const nextID = questionList[currentIndex + 1]['_id'];
+      setCurrentID(nextID);
+
+      const nextCheck = userAnswerList.get(nextID);
+      setAnswerChecked(nextCheck ? nextCheck : null);
+
     }
   }
-
-
-
-
-
 
   const stopQuiz = () => {
     Alert.alert('Oops', 'Wanna quit the test? Your progess won\'t be saved.', [
@@ -102,6 +56,37 @@ const Test = ({ route, navigation }) => {
   }
 
   const submit = () => {
+
+
+    let score = 0;
+
+    for (let [key, value] of userAnswerList) {
+      console.log(`${key} - ${value}`);
+      for (const question of questionList) {
+
+        if (key == question._id && value == question.correctAnswer) {
+          // console.log(question);
+          score++;
+        }
+      }
+    }
+
+    let scoreText = null;
+    if (score < 10) {
+      scoreText = "Practice more to improve it :D";
+    }
+    if (score <= 13 && score >= 10) {
+      scoreText = "Good, keep up!";
+    }
+    if (score >= 14 && score <= 16) {
+      scoreText = "Good, keep up!";
+    }
+    if (score > 16) {
+      scoreText = "Perfect!!";
+    }
+
+
+
     Alert.alert('Wow', 'Wanna submit the test?', [
       {
         text: 'Cancel',
@@ -111,28 +96,28 @@ const Test = ({ route, navigation }) => {
       {
         text: 'Submit', onPress: () => navigation.navigate('Result', {
           abbr: abbr,
-          fullname: fullname
-
+          fullname: fullname,
+          score: score,
+          scoreText: scoreText
         })
+
       },
     ]);
 
   }
 
-  const answerCheck = (key) => {
+
+  const onAnswerPress = (key) => {
     setAnswerChecked(key);
-    setUserAnswerList((prevState) => {
-      return {
-        ...prevState,
-     
-      };
-    });
-
-    // console.log(userAnswerList);
-
-
+    setUserAnswerList((prev) => new Map(prev).set(currentID, key));
 
   }
+
+  useEffect(() => {
+    setAnswerChecked(userAnswerList.get(currentID));
+  }, [answerChecked, userAnswerList])
+
+
 
   // handle hardware back button
   useEffect(() => {
@@ -142,14 +127,14 @@ const Test = ({ route, navigation }) => {
 
 
 
-  const [testState, dispatch] = useReducer(testReducer, initialTestState);
+
 
   // RENDERING
 
   return (
     <View style={styles.container}>
 
-      <View style={[styles.row, { justifyContent: 'space-between', alignItems: 'center' }]}>
+      <View style={[styles.row, { justifyContent: 'space-between', alignItems: 'center', marginBottom: 5 }]}>
         <TouchableOpacity
           styles={styles.button}
           onPress={stopQuiz}>
@@ -190,47 +175,30 @@ const Test = ({ route, navigation }) => {
         </TouchableOpacity>
       </View>
 
-      <Text>{currentID}</Text>
+
+      {/* <Text>{currentID}</Text> */}
+
+
 
       {/* Questions area */}
       <ScrollView >
 
 
         {/* QUESTION TEXT */}
-
-
         <QuestionText text={questionList[currentIndex].text} />
-
-
-
 
         {/* 4 ANSWERS */}
         <View>
-
           {questionList[currentIndex].answers.map((answer, key) => {
-
             return (
 
 
-              <TouchableOpacity
-                key={key}
-                style={styles.answerContainer}
-                onPress={() => answerCheck(key)}
-              >
-                <View
-                  style={answerChecked == key ? styles.letterContainerChecked : styles.letterContainer}
-                >
-                  <Text style={answerChecked == key ? styles.letterChecked : styles.letter} >{letter[key]}</Text>
-                </View>
-                <Text style={styles.text}>{answer}</Text>
-              </TouchableOpacity>
 
+              <AnswerItem key={key} keyProp={key} answer={answer} answerChecked={answerChecked} onAnswerPress={onAnswerPress} />
 
 
             );
-
           })}
-
 
         </View>
 
@@ -250,6 +218,7 @@ const Test = ({ route, navigation }) => {
         <TouchableOpacity
           styles={styles.button}
           onPress={prev}
+          disabled={currentIndex == 0}
         >
           <View style={styles.button}>
             <FontAwesome name='arrow-left' size={15} color='white' />
@@ -263,6 +232,8 @@ const Test = ({ route, navigation }) => {
         <TouchableOpacity
           styles={styles.button}
           onPress={next}
+          disabled={currentIndex == 19}
+
         >
           <View style={styles.button}>
             <FontAwesome name='arrow-right' size={15} color='white' />
@@ -336,55 +307,5 @@ const styles = StyleSheet.create({
 
   },
 
-  answerContainer: {
-    flexDirection: 'row',
-    width: '100%',
-    backgroundColor: 'white',
-    marginVertical: 10,
-    padding: 15,
-    borderRadius: 20,
-    alignItems: 'center'
-
-
-  },
-  letterContainer: {
-    width: 40,
-    height: 40,
-
-    borderRadius: 100,
-    backgroundColor: 'rgba(0,0,0,.2)',
-    justifyContent: 'center',
-    alignItems: 'center'
-  },
-  letter: {
-    fontFamily: 'Montserrat-Bold',
-    color: colors.secondary_dark_blue
-
-
-  },
-  letterContainerChecked: {
-
-    width: 40,
-    height: 40,
-
-    borderRadius: 100,
-    backgroundColor: colors.primary_pink,
-    justifyContent: 'center',
-    alignItems: 'center'
-  },
-  letterChecked: {
-    fontFamily: 'Montserrat-Bold',
-    color: 'white'
-
-  }
-
-  ,
-  text: {
-    flex: 1,
-    fontFamily: 'Montserrat-Regular',
-    paddingLeft: 10,
-
-
-  }
 
 })
