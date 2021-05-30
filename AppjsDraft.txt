@@ -1,0 +1,168 @@
+//App.js for AsyncStorage
+
+
+
+import React, { useEffect, useMemo, useReducer, useState } from 'react';
+import { useFonts } from 'expo-font';
+import AppLoading from 'expo-app-loading';
+import AppStack from './navigation/AppStack';
+import AuthenticationStack from './navigation/AuthenticationStack';
+import { NavigationContainer } from '@react-navigation/native';
+import { ActivityIndicator, View } from 'react-native';
+import { colors } from './utils/colors';
+import { AuthContext } from './components/context';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+
+
+
+export default function App() {
+  // declare the fonts to use
+  let [fontsLoaded] = useFonts({
+    'Montserrat-Bold': require('./assets/fonts/Montserrat-Bold.ttf'),
+    'Montserrat-Black': require('./assets/fonts/Montserrat-Black.ttf'),
+    'Montserrat-ExtraBold': require('./assets/fonts/Montserrat-ExtraBold.ttf'),
+    'Montserrat-Regular': require('./assets/fonts/Montserrat-Regular.ttf'),
+    'Montserrat-Medium': require('./assets/fonts/Montserrat-Medium.ttf'),
+    'Montserrat-SemiBold': require('./assets/fonts/Montserrat-SemiBold.ttf'),
+    'Montserrat-BoldItalic': require('./assets/fonts/Montserrat-BoldItalic.ttf'),
+  });
+
+
+  const initialLoginState = {
+    email: null,
+    userToken: null,
+    isLoading: true
+  }
+
+
+  const loginReducer = (prevState, action) => {
+    switch (action.type) {
+      case 'RETRIEVE TOKEN':
+        return {
+          ...prevState,
+          userToken: action.token,
+          isLoading: false
+        };
+      case 'SIGNIN':
+        return {
+          ...prevState,
+          email: action.id,
+          userToken: action.token,
+          isLoading: false
+        };
+      case 'SIGNOUT':
+        return {
+          ...prevState,
+          email: null,
+          userToken: null,
+          isLoading: false
+        };
+      case 'SIGNUP':
+        return {
+          ...prevState,
+          email: action.id,
+          userToken: action.token,
+          isLoading: false
+        };
+      default:
+        return {};
+    }
+  }
+
+
+  // REDUCER
+  const [loginState, dispatch] = useReducer(loginReducer, initialLoginState);
+
+
+
+
+  const authContext = useMemo(() => ({
+    signIn: async (email, password) => {
+      let userToken;
+      if (email == 'email' && password == 'password') {
+        try {
+          userToken = 'abc';
+          await AsyncStorage.setItem('userToken', userToken);
+        } catch (error) {
+          console.log(error);
+        }
+      }
+      dispatch({ type: 'SIGNIN', id: email, token: userToken })
+    },
+    signOut: async () => {
+
+      try {
+        await AsyncStorage.removeItem('userToken');
+      } catch (error) {
+        console.log(error);
+      }
+
+      dispatch({ type: 'SIGNOUT' })
+    },
+    signUp: () => {
+      // setUserToken('abc');
+      // setIsLoading(false);
+    }
+
+  }))
+
+
+
+
+  useEffect(() => {
+    setTimeout(async () => {
+      let userToken;
+      try {
+        userToken = await AsyncStorage.getItem('userToken');
+      } catch (error) {
+        console.log(error);
+      }
+      dispatch({ type: 'SIGNUP', token: userToken })
+
+    }, 1000);
+  }, [])
+
+
+
+
+
+  if (loginState.isLoading) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size='large' color={colors.primary_pink} style='' />
+      </View>
+
+    );
+  }
+
+
+
+
+  // if all fonts are not loaded return apploading 
+  if (!fontsLoaded) {
+    return (
+      <AppLoading />
+    );
+  } else {
+    return (
+
+      <AuthContext.Provider value={authContext}>
+        <NavigationContainer>
+          {loginState.userToken != null ? <AppStack /> : <AuthenticationStack />}
+          {/* <AuthenticationStack/> */}
+          {/* <AppStack/> */}
+        </NavigationContainer>
+      </AuthContext.Provider>
+
+    );
+
+  }
+}
+
+
+
+
+
+
+
