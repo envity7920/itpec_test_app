@@ -8,7 +8,7 @@ import { colors } from '../utils/colors';
 import { windowWidth, windowHeight} from '../utils/Dimension';
 
 
-const FormInput= ({labelValue, iconName, placeholder, infoType, updateSecureTextEntry,  isSecureTextEntry, check_textInputChange, isValidEmail, ...rest}) => {
+const FormInput= ({labelValue, iconName, placeholder, infoType, updateSecureTextEntry,  isSecureTextEntry, check_textInputChange, isValidInfo , ...rest}) => {
     return (
         <View style={styles.inputContainer}>
             <View style={styles.iconContainer}>
@@ -24,7 +24,7 @@ const FormInput= ({labelValue, iconName, placeholder, infoType, updateSecureText
             {...rest} />
 
       
-            {check_textInputChange == true && infoType == 'email' && isValidEmail ? 
+            {check_textInputChange == true  && isValidInfo ? 
             <View style={[styles.iconContainer, {backgroundColor: 'white', borderWidth: 1, borderColor: 'green'}]}>
                 <AntDesign name='check'  size={15} color='green'/>
             </View>

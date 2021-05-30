@@ -4,8 +4,9 @@ import { createStackNavigator, CardStyleInterpolators  } from '@react-navigation
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Onboard from '../screens/Onboard';
-import Login from '../screens/Login';
+
 import Signup from '../screens/Signup';
+import Signin from '../screens/Signin';
 
 
 
@@ -34,7 +35,7 @@ export default function AuthenticationStack() {
   } else if (isFirstLaunch === true) {
     routeName = "Onboard";
   } else {
-    routeName = "Login";
+    routeName = "Signin";
   }
 
   
@@ -55,8 +56,8 @@ export default function AuthenticationStack() {
             />
             <Stack.Screen 
            
-            name="Login" 
-            component={Login}
+            name="Signin" 
+            component={Signin}
             options={{header: () => null}}
             />
             <Stack.Screen 

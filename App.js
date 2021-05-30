@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useReducer, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { useFonts } from 'expo-font';
 import AppLoading from 'expo-app-loading';
@@ -9,7 +9,22 @@ import { ActivityIndicator, Alert, View } from 'react-native';
 import { colors } from './utils/colors';
 import { AuthContext } from './components/context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as firebase from 'firebase';
 
+
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCPej1lvv3ktcpB9weQbm17KX_BWjq3SeQ",
+  authDomain: "rn-itpec.firebaseapp.com",
+  projectId: "rn-itpec",
+  storageBucket: "rn-itpec.appspot.com",
+  messagingSenderId: "647627597329",
+  appId: "1:647627597329:web:2dbbcfea90f1756de0b3b0"
+};
+// Initialize Firebase
+if (firebase.apps.length === 0) {
+  firebase.initializeApp(firebaseConfig);
+}
 
 
 
@@ -26,127 +41,32 @@ export default function App() {
   });
 
 
-  const initialLoginState = {
-    email: null,
-    userToken: null,
-    isLoading: true
-  }
-
-
-  const loginReducer = (prevState, action) => {
-    switch (action.type) {
-      case 'RETRIEVE TOKEN':
-        return {
-          ...prevState,
-          userToken: action.token,
-          isLoading: false
-        };
-      case 'SIGNIN':
-        return {
-          ...prevState,
-          email: action.id,
-          userToken: action.token,
-          isLoading: false
-        };
-      case 'SIGNOUT':
-        return {
-          ...prevState,
-          email: null,
-          userToken: null,
-          isLoading: false
-        };
-      case 'SIGNUP':
-        return {
-          ...prevState,
-          email: action.id,
-          userToken: action.token,
-          isLoading: false
-        };
-      default:
-        return {};
-    }
-  }
-
-
-  // REDUCER
-  const [loginState, dispatch] = useReducer(loginReducer, initialLoginState);
+  // FIREBASE
+  const [user, setUser] = useState(null);
+  const [initializing, setInitializing] = useState(true);
+  
 
 
 
-
-  const authContext = useMemo(() => ({
-    signIn: async (email, password) => {
-      let userToken;
-      if (email == 'email' && password == 'password') {
-        try {
-          userToken = 'abc';
-          await AsyncStorage.setItem('userToken', userToken);
-        } catch (error) {
-          console.log(error);
-        }
-      } else {
-
-        Alert.alert('OOPS', 'Invalid combination of email and password!', [
-
-          {
-            text: 'Cancel',
-            onPress: () => { return },
-            style: 'cancel'
-          },
-
-
-        ])
-
-      }
-      dispatch({ type: 'SIGNIN', id: email, token: userToken })
-    },
-    signOut: async () => {
-
-      try {
-        await AsyncStorage.removeItem('userToken');
-      } catch (error) {
-        console.log(error);
-      }
-
-      dispatch({ type: 'SIGNOUT' })
-    },
-    signUp: () => {
-      // setUserToken('abc');
-      // setIsLoading(false);
-    }
-
-  }))
-
-
-
+  const onAuthStateChanged = (user) => {
+    setUser(user);
+    if (initializing) setInitializing(false);
+  };
 
   useEffect(() => {
-    setTimeout(async () => {
-      let userToken;
-      try {
-        userToken = await AsyncStorage.getItem('userToken');
-      } catch (error) {
-        console.log(error);
-      }
-      dispatch({ type: 'SIGNUP', token: userToken })
-
-    }, 1000);
-  }, [])
+    const subscriber = firebase.auth().onAuthStateChanged(onAuthStateChanged);
+    return subscriber; // unsubscribe on unmount
+  }, []);
 
 
 
 
+  if (initializing) return (
+    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+      <ActivityIndicator size='large' color={colors.primary_pink} style='' />
+    </View>
 
-  if (loginState.isLoading) {
-    return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <ActivityIndicator size='large' color={colors.primary_pink} style='' />
-      </View>
-
-    );
-  }
-
-
+  );
 
 
   // if all fonts are not loaded return apploading 
@@ -157,11 +77,36 @@ export default function App() {
   } else {
     return (
 
-      <AuthContext.Provider value={authContext}>
+      <AuthContext.Provider value={{
+        user,
+        setUser,
+        signIn: async (email, password) => {
+          try {
+            await firebase.auth().signInWithEmailAndPassword(email, password);
+          } catch (e) {
+            console.log(e);
+          }
+        },
+        signOut: async () => {
+          try {
+            await firebase.auth().signOut();
+          } catch (e) {
+            console.log(e);
+          }
+        },
+        signUp: async (email, password) => {
+         
+          // try {
+            await firebase.auth().createUserWithEmailAndPassword(email, password);
+          // } catch (error) {
+          //   console.log(error);
+          //   return error;
+          // }
+        }
+
+      }}>
         <NavigationContainer>
-          {loginState.userToken != null ? <AppStack /> : <AuthenticationStack />}
-          {/* <AuthenticationStack/> */}
-          {/* <AppStack/> */}
+          {user != null ? <AppStack /> : <AuthenticationStack />}
         </NavigationContainer>
       </AuthContext.Provider>
 
