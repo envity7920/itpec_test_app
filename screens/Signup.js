@@ -1,27 +1,35 @@
-import React, { useState } from 'react'
-import { ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native';
+import React, { useContext, useEffect, useState } from 'react'
+import { Alert, Keyboard, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native';
 import FormButton from '../components/FormButton';
 
 import { colors } from '../utils/colors';
 import FormInput from '../components/FormInput';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import SocialButton from '../components/SocialButton';
-
+import { emailPattern, passwordPattern } from '../utils/patterns';
+import { set } from 'react-native-reanimated';
+import { AuthContext } from '../components/context';
+import * as firebase from 'firebase';
 
 
 const Signup = ({ navigation }) => {
 
-  const emailPattern = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
-  const passwordPattern = new RegExp("^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,})");
+  const { signUp, authError } = useContext(AuthContext);
 
   const [data, setData] = useState({
     email: '',
     password: '',
-    check_textInputChange: false,
-    isSecureTextEntry: true,
-    isSecureConfirmTextEntry: true,
+    confirmPassword: '',
+    check_emailInputChange: false,
+    check_passwordInputChange: false,
+    check_cfPassChange: false,
+
     isValidEmail: true,
-    isValidPassword: true
+    isValidPassword: true,
+
+
+    error: null,
+
 
   });
 
@@ -32,14 +40,14 @@ const Signup = ({ navigation }) => {
         ...data,
         email: val,
         isValidEmail: true,
-        check_textInputChange: true
+        check_emailInputChange: true
       });
     } else {
       setData({
         ...data,
         email: val,
         isValidEmail: false,
-        check_textInputChange: false
+        check_emailInputChange: false
       });
 
     }
@@ -52,6 +60,7 @@ const Signup = ({ navigation }) => {
         ...data,
         password: val,
         isValidPassword: true,
+        check_passwordInputChange: true,
 
       });
     } else {
@@ -59,21 +68,50 @@ const Signup = ({ navigation }) => {
         ...data,
         password: val,
         isValidPassword: false,
-
+        check_passwordInputChange: false
       });
 
     }
   }
 
-  const updateSecureTextEntry = () => {
-    setData(
-      {
-        ...data,
-        isSecureTextEntry: !data.isSecureTextEntry
-      }
-    );
+  const confirmPassword = (val) => {
+    val.length !== 0 ? setData({
+      ...data,
+      confirmPassword: val,
+      check_cfPassChange: true
+    }) : setData({ ...data, confirmPassword: '', check_cfPassChange: false });
   }
 
+  const handleSignUp = async () => {
+    const condition = data.email != null &&
+      data.password != null &&
+      (data.isValidEmail == true) &&
+      (data.isValidPassword == true) &&
+      (data.password == data.confirmPassword);
+
+    if (condition == false) {
+      Alert.alert('Invalid Input!', 'Please provide valid information.', [
+        {
+          text: 'OK',
+          onPress: () => { return },
+        }
+      ]);
+    } else {
+      try {
+        await signUp(data.email, data.password);
+      } catch (error) {
+        console.log(error);
+
+        Alert.alert('Warning', error.message, [
+          {
+            text: 'OK',
+            onPress: () => { return },
+          }
+        ]);
+      }
+
+    }
+  }
 
 
 
@@ -86,7 +124,7 @@ const Signup = ({ navigation }) => {
       <View style={{ height: '100%', backgroundColor: 'white' }}>
         <ScrollView contentContainerStyle={styles.container}>
           <View style={{ width: '100%', justifyContent: 'center' }}>
-            <TouchableOpacity styles={styles.backBtn} onPress={() => navigation.navigate("Login")}>
+            <TouchableOpacity styles={styles.backBtn} onPress={() => navigation.navigate("Signin")}>
               <AntDesign name='left' size={20} color={colors.secondary_dark_blue} />
             </TouchableOpacity>
           </View>
@@ -102,12 +140,12 @@ const Signup = ({ navigation }) => {
             keyboardType='email-address'
             autoCapitalize='none'
             infoType='email'
-            check_textInputChange={data.check_textInputChange}
-            isValidEmail={data.isValidEmail}
+            check_textInputChange={data.check_emailInputChange}
+            isValidInfo={data.isValidEmail}
           />
 
-          {data.isValidEmail ? null : <Text style={styles.error}>Invalid email</Text>}
-
+          {data.isValidEmail ? null : <Text style={styles.error}>Invalid email. {authError}</Text>}
+          {/* <Text>{authError}</Text> */}
 
 
           <FormInput
@@ -115,31 +153,37 @@ const Signup = ({ navigation }) => {
             onChangeText={(val) => passwordChange(val)}
             iconName='lock'
             placeholder='Password'
-            infoType='password'
-            isSecureTextEntry={data.isSecureTextEntry}
-           
+            autoCapitalize='none'
+            secureTextEntry
+            check_textInputChange={data.check_passwordInputChange}
+            isValidInfo={data.isValidPassword}
           />
 
           {data.isValidPassword ? null : <Text style={styles.error}>Password must contain
-        {'\n'}* At least 8 characters.
-       {'\n'} * At least 1 lowercase alphabetical character
-       {'\n'} * At least 1 uppercase alphabetical character
+        {'\n'}* At least 6 characters.
+       {'\n'}* At least 1 lowercase alphabetical character
+       {'\n'}* At least 1 uppercase alphabetical character
        {'\n'}* least one special character (!@#$%^&*)</Text>}
 
           <FormInput
-            // labelValue={data.password}
-            // onChangeText={(val) => passwordChange(val)}
+            labelValue={data.confirmPassword}
+            onChangeText={(val) => confirmPassword(val)}
             iconName='lock'
             placeholder='Confirm password'
-            infoType='password'
-            isSecureTextEntry={data.isSecureConfirmTextEntry}
-        
+            autoCapitalize='none'
+            secureTextEntry
+            check_textInputChange={data.check_cfPassChange}
+            isValidInfo={data.password == data.confirmPassword}
+
           />
+
+          {data.password == data.confirmPassword ? null : <Text style={styles.error}>Password not matched</Text>}
+
+
 
           <FormButton
             formButtonText={'Sign up'}
-            onPress={() => alert('Sign in btn clicked.')}
-          />
+            onPress={() => handleSignUp()} />
 
           <TouchableOpacity>
 
@@ -167,7 +211,7 @@ const Signup = ({ navigation }) => {
             backgroundColor='#f5e7ea' />
 
 
-          <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+          <TouchableOpacity onPress={() => navigation.navigate('Signin')}>
             <Text
               style={{
                 fontFamily: 'Montserrat-SemiBold',
@@ -191,13 +235,10 @@ const Signup = ({ navigation }) => {
 
 const styles = StyleSheet.create({
   container: {
-    // height: '100%',
-
     backgroundColor: '#fff',
     alignItems: 'center',
-    // justifyContent: 'center',
     padding: 20,
-    paddingTop: 50
+    paddingTop: 40
   },
   backBtn: {
     marginVertical: 10,

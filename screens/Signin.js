@@ -1,19 +1,13 @@
 import React, { useContext, useState } from 'react'
-import { Image, Keyboard, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native';
+import { Alert, Image, Keyboard, ScrollView, StyleSheet, Text, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native';
 import FormButton from '../components/FormButton';
-
 import { colors } from '../utils/colors';
 import FormInput from '../components/FormInput';
-
 import SocialButton from '../components/SocialButton';
-
 import { AuthContext } from '../components/context';
+import { emailPattern, passwordPattern } from '../utils/patterns';
 
-const Login = ({ navigation }) => {
-
-  const emailPattern = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
-  const passwordPattern = new RegExp("^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,})");
-  // STATES
+const Signin = ({ navigation }) => {
   const [data, setData] = useState({
     email: '',
     password: '',
@@ -21,7 +15,6 @@ const Login = ({ navigation }) => {
     isSecureTextEntry: true,
     isValidEmail: true,
     isValidPassword: true
-
   });
 
 
@@ -82,6 +75,34 @@ const Login = ({ navigation }) => {
   }
 
 
+  const handleSignIn = async () => {
+    const condition = data.email != null &&
+      data.password != null &&
+      (data.isValidEmail == true) &&
+      (data.isValidPassword == true);
+
+    if (!condition) {
+      Alert.alert('Invalid Input!', 'Please provide valid information.', [
+        {
+          text: 'OK',
+          onPress: () => { return },
+        }
+      ]);
+    } else {
+      try {
+        await signIn(data.email, data.password);
+      } catch (error) {
+        console.log(error);
+        Alert.alert('Warning', error.message, [
+          {
+            text: 'OK',
+            onPress: () => { return },
+          }
+        ]);
+      }
+
+    }
+  }
 
 
   // RENDERING 
@@ -106,7 +127,7 @@ const Login = ({ navigation }) => {
             autoCapitalize='none'
             infoType='email'
             check_textInputChange={data.check_textInputChange}
-            isValidEmail={data.isValidEmail}
+            isValidInfo={data.isValidEmail}
           />
 
           {data.isValidEmail ? null : <Text style={styles.error}>Invalid email</Text>}
@@ -123,16 +144,16 @@ const Login = ({ navigation }) => {
             updateSecureTextEntry={updateSecureTextEntry}
           />
 
-          {data.isValidPassword ? null : <Text style={styles.error}>Password must contain
+          {/* {data.isValidPassword ? null : <Text style={styles.error}>Password must contain
         {'\n'}* At least 8 characters.
        {'\n'} * At least 1 lowercase alphabetical character
        {'\n'} * At least 1 uppercase alphabetical character
-       {'\n'}* least one special character (!@#$%^&*)</Text>}
+       {'\n'}* least one special character (!@#$%^&*)</Text>} */}
 
 
           <FormButton
             formButtonText={'Sign in'}
-            onPress={() => { signIn(data.email, data.password) }}
+            onPress={() => handleSignIn()}
           />
 
           <TouchableOpacity>
@@ -177,13 +198,10 @@ const Login = ({ navigation }) => {
 
 const styles = StyleSheet.create({
   container: {
-
-
     backgroundColor: '#fff',
     alignItems: 'center',
-    // justifyContent: 'center',
     padding: 20,
-    paddingTop: 50
+    paddingTop: 40
   },
 
   logo: {
@@ -204,4 +222,4 @@ const styles = StyleSheet.create({
 });
 
 
-export default Login
+export default Signin

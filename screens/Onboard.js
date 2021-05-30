@@ -18,8 +18,8 @@ const Done = ({...props}) => (
 
     return (
         <Onboarding
-        onSkip = {()=>navigation.replace("Login")}
-        onDone = {()=>navigation.navigate("Login")}
+        onSkip = {()=>navigation.replace("Signin")}
+        onDone = {()=>navigation.navigate("Signin")}
         DoneButtonComponent = {Done}
   pages={[
     {
