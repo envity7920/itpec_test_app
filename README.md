@@ -1,6 +1,18 @@
 <h1>ITPEC Test Preparation Apllication _ React Native (with Expo)</h1>
 <h2>Overview</h2>
 <p>A simple React Native application to do ITPEC mock tests in a alloted time.</p>
+
+<h2>Main features</h2>
+<ul>
+<li>Sign in/ Sign up using Firebase Authentication</li>
+<li>Time-controlled tests</li>
+<li>Navigation between questions (user answers are saved and displayed)</li>
+<li>Result review</li>
+</ul>
+
+
+
+
 <h2>Prequisites</h2>
 <ul>
 <li>VS code</li>
