@@ -5,7 +5,7 @@ import AppLoading from 'expo-app-loading';
 import AppStack from './navigation/AppStack';
 import AuthenticationStack from './navigation/AuthenticationStack';
 import { NavigationContainer } from '@react-navigation/native';
-import { ActivityIndicator, View } from 'react-native';
+import { ActivityIndicator, Alert, View } from 'react-native';
 import { colors } from './utils/colors';
 import { AuthContext } from './components/context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -84,6 +84,19 @@ export default function App() {
         } catch (error) {
           console.log(error);
         }
+      } else {
+
+        Alert.alert('OOPS', 'Invalid combination of email and password!', [
+
+          {
+            text: 'Cancel',
+            onPress: () => { return },
+            style: 'cancel'
+          },
+
+
+        ])
+
       }
       dispatch({ type: 'SIGNIN', id: email, token: userToken })
     },
