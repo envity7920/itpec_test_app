@@ -1,5 +1,5 @@
 
-
+import AppLoading from 'expo-app-loading';
 import React from 'react';
 import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import AntDesign from 'react-native-vector-icons/AntDesign';
@@ -58,21 +58,23 @@ const styles = StyleSheet.create({
         marginTop: 5,
         marginBottom: 10,
         width: '100%',
-        height: windowHeight / 15,
-        borderColor: colors.primary_pink,
-        borderRadius: 30,
-        borderWidth: 1,
+        height: windowHeight / 12,
+        borderColor: colors.primary_bluee,
+        borderRadius: 25,
+        borderWidth: 1.5,
         flexDirection: 'row',
         alignItems: 'center',
         backgroundColor: '#fff',
         
+        
       },
 
     iconContainer : {
-        marginHorizontal: 5,
+        margin: 5,
         padding: 10,
         borderRadius: 100,
-        backgroundColor: colors.primary_pink
+        backgroundColor: colors.primary_bluee,
+    
     }, 
     input: {
         padding: 10,

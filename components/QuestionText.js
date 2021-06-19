@@ -1,6 +1,7 @@
 import React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 import { colors } from '../utils/colors'
+import AppLoading from 'expo-app-loading';
 
 const QuestionText = ({text}) => {
     return (

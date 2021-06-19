@@ -6,6 +6,7 @@ import FormInput from '../components/FormInput';
 import SocialButton from '../components/SocialButton';
 import { AuthContext } from '../components/context';
 import { emailPattern, passwordPattern } from '../utils/patterns';
+import AppLoading from 'expo-app-loading';
 
 const Signin = ({ navigation }) => {
   const [data, setData] = useState({
@@ -116,7 +117,7 @@ const Signin = ({ navigation }) => {
       <View style={{ height: '100%', backgroundColor: 'white' }}>
         <ScrollView contentContainerStyle={styles.container}>
 
-          <Image style={styles.logo} source={require('../assets/images/logo-text.png')} />
+          <Image style={styles.logo} source={require('../assets/images/app_logo.png')} />
 
           <FormInput
             labelValue={data.email}
@@ -205,7 +206,7 @@ const styles = StyleSheet.create({
   },
 
   logo: {
-    marginTop: 0,
+    marginBottom: 20,
     height: 120,
     width: 120,
     resizeMode: 'cover'

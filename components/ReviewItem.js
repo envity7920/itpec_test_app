@@ -3,7 +3,7 @@ import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { colors } from '../utils/colors';
 import AppLoading from 'expo-app-loading';
 
-const AnswerItem = ({ answer, answerChecked , onAnswerPress, keyProp}) => {
+const ReviewItem = ({ answer, answerChecked , onAnswerPress, keyProp, userAnswerList}) => {
     const letter = ['A', 'B', 'C', 'D'];
 
 
@@ -14,7 +14,7 @@ const AnswerItem = ({ answer, answerChecked , onAnswerPress, keyProp}) => {
             onPress={() => onAnswerPress(keyProp)}
         >
             <View
-                style={answerChecked == keyProp ? styles.letterContainerChecked : styles.letterContainer}
+                style={answerChecked == keyProp? styles.letterContainerChecked : styles.letterContainer}
             >
                 <Text style={answerChecked == keyProp ? styles.letterChecked : styles.letter} >{letter[keyProp]}</Text>
             </View>
@@ -23,7 +23,7 @@ const AnswerItem = ({ answer, answerChecked , onAnswerPress, keyProp}) => {
     )
 }
 
-export default AnswerItem
+export default ReviewItem
 
 const styles = StyleSheet.create({
 
@@ -44,7 +44,7 @@ const styles = StyleSheet.create({
         height: 40,
 
         borderRadius: 100,
-        backgroundColor: 'rgba(0,0,0,.2)',
+        backgroundColor: colors.secondary_red,
         justifyContent: 'center',
         alignItems: 'center'
     },
@@ -60,7 +60,7 @@ const styles = StyleSheet.create({
         height: 40,
 
         borderRadius: 100,
-        backgroundColor: colors.primary_pink,
+        backgroundColor: colors.secondary_green,
         justifyContent: 'center',
         alignItems: 'center'
     },

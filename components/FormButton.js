@@ -3,12 +3,13 @@ import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { colors } from '../utils/colors';
 import { windowHeight } from '../utils/Dimension';
+import AppLoading from 'expo-app-loading';
 
 const FormButton = ({formButtonText, ...rest}) => {
     return (
         
             <TouchableOpacity style={styles.container} {...rest}>
-                <Text style={{color: colors.secondary_dark_blue, fontFamily: 'Montserrat-Bold', fontSize: 16}}>{formButtonText}</Text>
+                <Text style={{color: colors.white, fontFamily: 'Montserrat-Bold', fontSize: 16}}>{formButtonText}</Text>
             </TouchableOpacity>
         
     )
@@ -25,7 +26,7 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: colors.primary_pink,
+        backgroundColor: colors.primary_bluee,
         color: colors.secondary_dark_blue
     }
 

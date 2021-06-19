@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View, ImageBackground} from 'react-native';
 import { colors } from '../utils/colors';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
@@ -10,6 +10,10 @@ const Start = ({ route, navigation }) => {
 
     return (
         <View style={styles.container}>
+            <ImageBackground
+        style={styles.background}
+        source={require('../assets/images/login-bg.png')}
+      >
             <View style={{
                 width: '100%',
                 justifyContent: 'flex-start',
@@ -58,7 +62,7 @@ const Start = ({ route, navigation }) => {
 
                 <Text style={styles.startQuiz}>START!</Text>
             </TouchableOpacity>
-
+            </ImageBackground>
 
         </View>
     )
@@ -67,15 +71,21 @@ const Start = ({ route, navigation }) => {
 export default Start
 
 const styles = StyleSheet.create({
-
+    background: {
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        width: '100%',
+        height: '100%',
+        resizeMode: 'center'
+      },
     container: {
 
         height: '100%',
         backgroundColor: colors.primary_pink,
         alignItems: 'center',
         // justifyContent: 'center',
-        padding: 20,
-        paddingTop: 40
+       
 
     },
     backBtn: {

@@ -1,6 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react'
 import { Alert, Keyboard, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native';
 import FormButton from '../components/FormButton';
+import AppLoading from 'expo-app-loading';
 
 import { colors } from '../utils/colors';
 import FormInput from '../components/FormInput';

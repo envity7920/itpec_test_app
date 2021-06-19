@@ -6,7 +6,7 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 const Result = ({ route, navigation }) => {
 
 
-    const { abbr, fullname, score , scoreText} = route.params;
+    const { abbr, fullname, score, scoreText, answerChecked, userAnswerList, setAnswerChecked, setCurrentID, setCurrentIndex, currentID, currentIndex , questionList} = route.params;
 
     return (
         <View style={styles.container}>
@@ -41,9 +41,10 @@ const Result = ({ route, navigation }) => {
             <Text style={{
                 marginTop: 20,
                 fontFamily: 'Montserrat-ExtraBold',
-                 color: colors.secondary_dark_blue, 
-                 fontSize: 25}}>
-                Your result: 
+                color: colors.secondary_dark_blue,
+                fontSize: 25
+            }}>
+                Your result:
             </Text>
 
             <View style={{
@@ -65,7 +66,7 @@ const Result = ({ route, navigation }) => {
             }}>
                 <Text style={styles.text}>{scoreText}</Text>
 
-                
+
             </View>
 
             <TouchableOpacity
@@ -78,6 +79,27 @@ const Result = ({ route, navigation }) => {
             >
 
                 <Text style={[styles.startQuiz, { textAlign: 'center' }]}>REDO THE TEST</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+                style={styles.startQuizBtn}
+                onPress={() => navigation.navigate('Review', {
+                    abbr: abbr,
+                    fullname: fullname,
+                    answerChecked: answerChecked,
+                    setAnswerChecked: setAnswerChecked,
+                    userAnswerList: userAnswerList,
+                    currentIndex: currentIndex,
+                    setCurrentIndex: setCurrentIndex,
+                    setCurrentID: setCurrentID,
+                    currentID: currentID,
+                    questionList: questionList
+
+                })}
+
+            >
+
+                <Text style={[styles.startQuiz, { textAlign: 'center' }]}>REVIEW</Text>
             </TouchableOpacity>
 
 

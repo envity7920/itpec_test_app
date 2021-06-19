@@ -1,23 +1,18 @@
 import React, { useEffect, useReducer, useState } from 'react';
-import { Alert, BackHandler, FlatList, ScrollView, StyleSheet, Text, TouchableOpacity, View , ImageBackground} from 'react-native';
+import { Alert, BackHandler, FlatList, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import CountDown from 'react-native-countdown-component';
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import AnswerItem from '../components/AnswerItem';
 
 import QuestionText from '../components/QuestionText';
+import ReviewItem from '../components/ReviewItem';
 import { colors } from '../utils/colors';
 import { questions } from '../utils/exams';
 
-const Test = ({ route, navigation }) => {
+const Review = ({ route, navigation }) => {
   // Get question list from exam name
-  const { abbr, fullname } = route.params;
-  const questionList = questions[abbr];
-
-
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [currentID, setCurrentID] = useState(questionList[0]['_id']);
-  const [userAnswerList, setUserAnswerList] = useState(new Map());
-  const [answerChecked, setAnswerChecked] = useState();
+  const { abbr, fullname, answerChecked, userAnswerList, setCurrentIndex, setCurrentID, setAnswerChecked, currentID, currentIndex, questionList } = route.params;
+ 
 
   const prev = () => {
     if (currentIndex > 0) {
@@ -30,7 +25,7 @@ const Test = ({ route, navigation }) => {
 
     }
   }
-
+console.log(currentIndex+"-----" + currentID)
   const next = () => {
     if (currentIndex < questionList.length - 1) {
       setCurrentIndex(currentIndex + 1);
@@ -55,65 +50,7 @@ const Test = ({ route, navigation }) => {
     return true;
   }
 
-  const submit = () => {
-
-
-    let score = 0;
-
-    for (let [key, value] of userAnswerList) {
-      console.log(`${key} - ${value}`);
-      for (const question of questionList) {
-
-        if (key == question._id && value == question.correctAnswer) {
-          // console.log(question);
-          score++;
-        }
-      }
-    }
-
-    let scoreText = null;
-    if (score < 10) {
-      scoreText = "Practice more to improve it :D";
-    }
-    if (score <= 13 && score >= 10) {
-      scoreText = "Good, keep up!";
-    }
-    if (score >= 14 && score <= 16) {
-      scoreText = "Good, keep up!";
-    }
-    if (score > 16) {
-      scoreText = "Perfect!!";
-    }
-
-
-
-    Alert.alert('Wow', 'Wanna submit the test?', [
-      {
-        text: 'Cancel',
-        onPress: () => null,
-        style: 'cancel',
-      },
-      {
-        text: 'Submit', onPress: () => navigation.navigate('Result', {
-          abbr: abbr,
-          fullname: fullname,
-          score: score,
-          scoreText: scoreText,
-          answerChecked:  answerChecked,
-          setAnswerChecked: setAnswerChecked,
-          userAnswerList: userAnswerList,
-          currentIndex: currentIndex,
-          setCurrentIndex:  setCurrentIndex,
-          setCurrentID: setCurrentID,
-          currentID: currentID,
-          questionList: questionList
-
-        })
-
-      },
-    ]);
-
-  }
+  
 
 
   const onAnswerPress = (key) => {
@@ -141,11 +78,9 @@ const Test = ({ route, navigation }) => {
   // RENDERING
 
   return (
-    
-    <ImageBackground 
-    source={require('../assets/images/login-bg.png')}style={styles.container}>
+    <View style={styles.container}>
 
-      <View style={[styles.row, { justifyContent: 'space-between', alignItems: 'center', backgroundColor: 'rgba(3, 156, 170, 0)'}]}>
+      <View style={[styles.row, { justifyContent: 'space-between', alignItems: 'center', marginBottom: 5 }]}>
         <TouchableOpacity
           styles={styles.button}
           onPress={stopQuiz}>
@@ -154,36 +89,9 @@ const Test = ({ route, navigation }) => {
           </View>
         </TouchableOpacity>
 
-        <View style={styles.timerContainer}>
-          {/* <FontAwesome5 name='stopwatch' size={20} color='white' /> */}
-          <CountDown
-            until={60 * 25}
-            size={25}
-            onFinish={() => alert('Finished')}
-            digitStyle={{ backgroundColor: '#FFFfff00' }}
-            digitTxtStyle={{ color: 'white', }}
-            timeToShow={['M', 'S']}
-            timeLabels={{ m: '', s: '' }}
-            onFinish={() => navigation.navigate('Result', {
-              abbr: abbr,
-              fullname: fullname
+      
 
-            })}
-            showSeparator
-            separatorStyle={{ color: '#fff' }}
-          />
-
-
-
-        </View>
-
-        <TouchableOpacity
-          styles={styles.button}
-          onPress={submit}>
-          <View style={styles.button}>
-            <FontAwesome name='paper-plane' size={15} color='white' />
-          </View>
-        </TouchableOpacity>
+       
       </View>
 
 
@@ -205,7 +113,7 @@ const Test = ({ route, navigation }) => {
 
 
 
-              <AnswerItem key={key} keyProp={key} answer={answer} answerChecked={answerChecked} onAnswerPress={onAnswerPress} />
+              <ReviewItem key={key} keyProp={key} answer={answer} answerChecked={answerChecked} onAnswerPress={onAnswerPress} userAnswerList={userAnswerList} currentID= {currentID} currentIndex = {currentIndex} />
 
 
             );
@@ -222,11 +130,9 @@ const Test = ({ route, navigation }) => {
       {
         justifyContent: 'space-between',
         // position: 'absolute',
-        
         bottom: 0,
-        paddingTop: 10,
-        backgroundColor: 'rgba(3, 156, 170, 0)',
-        
+        paddingTop: 10
+
       }]}>
         <TouchableOpacity
           styles={styles.button}
@@ -257,7 +163,7 @@ const Test = ({ route, navigation }) => {
 
       </View>
 
-    </ImageBackground>
+    </View>
   )
 }
 
@@ -265,18 +171,18 @@ const Test = ({ route, navigation }) => {
 
 
 
-export default Test
+export default Review
 
 const styles = StyleSheet.create({
- 
+
   container: {
     height: '100%',
-    // flexDirection: 'column',
+    flexDirection: 'column',
     padding: 20,
     paddingTop: 40,
-    // justifyContent: 'center',
-    // alignItems: 'center',
-  
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: colors.primary_pink
 
   },
   button: {

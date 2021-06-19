@@ -9,6 +9,7 @@ import Start from '../screens/Start';
 
 import Test from '../screens/Test';
 import Result from '../screens/Result';
+import Review from '../screens/Review';
 
 
 
@@ -56,7 +57,14 @@ export default function AppStack() {
           gestureEnabled: false
         }}
       />
-
+      <Stack.Screen
+        name="Review"
+        component={Review}
+        options={{
+          header: () => null,
+          gestureEnabled: false
+        }}
+      />
 
     </Stack.Navigator>
 
